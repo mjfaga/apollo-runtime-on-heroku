@@ -1,0 +1,206 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION) {
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(
+  graph: join__Graph
+  requires: join__FieldSet
+  provides: join__FieldSet
+  type: String
+  external: Boolean
+  override: String
+  usedOverridden: Boolean
+) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(
+  graph: join__Graph!
+  interface: String!
+) repeatable on OBJECT | INTERFACE
+
+directive @join__type(
+  graph: join__Graph!
+  key: join__FieldSet
+  extension: Boolean! = false
+  resolvable: Boolean! = true
+  isInterfaceObject: Boolean! = false
+) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(
+  url: String
+  as: String
+  for: link__Purpose
+  import: [link__Import]
+) repeatable on SCHEMA
+
+scalar join__FieldSet
+
+enum join__Graph {
+  APP @join__graph(name: "app", url: "http://localhost:4001/")
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type Mutation @join__type(graph: APP) {
+  """
+  An example field added by the generator
+  """
+  testField: String!
+}
+
+"""
+A person in the system
+"""
+type Person @join__type(graph: APP) {
+  """
+  URL to the person's avatar image
+  """
+  avatarUrl: String
+
+  """
+  List of email addresses associated with the person
+  """
+  emails: [PersonEmail!]!
+
+  """
+  The family name of the person
+  """
+  familyName: String
+
+  """
+  The full name of the person
+  """
+  fullName: String
+
+  """
+  The given name of the person
+  """
+  givenName: String
+
+  """
+  The headline or title of the person
+  """
+  headline: String
+
+  """
+  Highlights or key achievements of the person
+  """
+  highlights: [PersonHighlight!]!
+
+  """
+  The unique identifier of the person
+  """
+  id: ID!
+
+  """
+  LinkedIn identifiers for the person
+  """
+  linkedInIdentifiers: [PersonLinkedInIdentifier!]!
+
+  """
+  ID of the location associated with the person
+  """
+  locationId: ID
+
+  """
+  List of phone numbers associated with the person
+  """
+  phoneNumbers: [PersonPhoneNumber!]!
+
+  """
+  A brief summary about the person
+  """
+  summary: String
+}
+
+"""
+An email address associated with a person
+"""
+type PersonEmail @join__type(graph: APP) {
+  """
+  Indicates if this is the primary email address for the person
+  """
+  isPrimary: Boolean!
+
+  """
+  The email address
+  """
+  value: String!
+}
+
+"""
+A highlight associated with a person
+"""
+type PersonHighlight @join__type(graph: APP) {
+  """
+  The category of the highlight
+  """
+  category: String!
+
+  """
+  The highlight value
+  """
+  value: String!
+}
+
+"""
+A LinkedIn identifier associated with a person
+"""
+type PersonLinkedInIdentifier @join__type(graph: APP) {
+  """
+  Indicates if this is the primary LinkedIn slug for the person
+  """
+  isPrimary: Boolean!
+
+  """
+  The LinkedIn slug
+  """
+  value: String!
+}
+
+"""
+A phone number associated with a person
+"""
+type PersonPhoneNumber @join__type(graph: APP) {
+  """
+  Indicates if this is the primary phone number for the person
+  """
+  isPrimary: Boolean!
+
+  """
+  The phone number
+  """
+  value: String!
+}
+
+type Query @join__type(graph: APP) {
+  """
+  A person by email or LinkedIn slug.
+  """
+  personByEmailOrSlug(
+    """
+    Email or LinkedIn slug of the person.
+    """
+    value: String!
+  ): Person
+}
